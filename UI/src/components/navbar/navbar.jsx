@@ -29,7 +29,7 @@ const NavBar = () => {
                         itemId="accounts"
                         isActive={activeItem === 'accounts'}
                     >
-                        <Link to='/accounts'>
+                        <Link to='/dashboard/accounts'>
                             Accounts
                         </Link>
                     </NavItem>
@@ -39,7 +39,7 @@ const NavBar = () => {
                         itemId="clusters"
                         isActive={activeItem === 'clusters'}
                     >
-                        <Link to='/clusters'>
+                        <Link to='/dashboard/clusters'>
                             Clusters
                         </Link>
                     </NavItem>

@@ -1,0 +1,62 @@
+package db
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/patilsuraj767/ros-devtools/internal/config"
+	"github.com/patilsuraj767/ros-devtools/internal/logging"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+)
+
+var DB *gorm.DB = nil
+
+func initDB() {
+	cfg := config.GetConfig()
+	log := logging.GetLogger()
+	var (
+		user     = cfg.DBUser
+		password = cfg.DBPassword
+		dbname   = cfg.DBName
+		host     = cfg.DBHost
+		port     = cfg.DBPort
+		dbssl    = cfg.DBssl
+	)
+	rdsCA := CreateCACertFile(cfg.DBCACert)
+	dsn := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s sslrootcert=%s", user, password, dbname, host, port, dbssl, rdsCA)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	DB = db
+
+	log.Info("DB initialization complete")
+}
+
+func GetDB() *gorm.DB {
+	if DB == nil {
+		initDB()
+	}
+	return DB
+}
+
+func CreateCACertFile(certString string) string {
+	f, err := os.CreateTemp("", "RdsCa.pem")
+	if err != nil {
+		fmt.Printf("Unable to create RdsCa.pem: %s", err)
+		os.Exit(1)
+	}
+	_, err = f.Write([]byte(certString))
+	if err != nil {
+		fmt.Printf("Unable to write to RdsCa.pem: %s", err)
+		os.Exit(1)
+	}
+	return f.Name()
+}

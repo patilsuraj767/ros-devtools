@@ -1,21 +1,28 @@
 import React from 'react';
 import {
     Page,
-    PageSection,
     PageSidebar,
     PageSidebarBody,
-    Text,
-    TextContent,
     Masthead,
     MastheadToggle,
     MastheadMain,
     MastheadBrand,
-    Button
+    MastheadContent,
+    Button,
+    Toolbar,
+    ToolbarGroup,
+    ToolbarItem,
+    ButtonVariant
 } from '@patternfly/react-core';
 import BarsIcon from '@patternfly/react-icons/dist/js/icons/bars-icon';
 import NavBar from '../navbar/navbar';
+import { useNavigate } from "react-router-dom";
 
 const Layout = ({ children }) => {
+    const navigate = useNavigate();
+    const logoutClicked = () => {
+        navigate('/')
+    }
 
     const header = (
         <Masthead id="basic-example">
@@ -27,9 +34,23 @@ const Layout = ({ children }) => {
             <MastheadMain>
                 <MastheadBrand>ROS devtools</MastheadBrand>
             </MastheadMain>
-            {/* <MastheadContent>
-                <span>Content</span>
-            </MastheadContent> */}
+            <MastheadContent>
+                <Toolbar id="toolbar" isFullHeight isStatic>
+                    <ToolbarGroup
+                        variant="icon-button-group"
+                        align={{ default: 'alignRight' }}
+                        spacer={{ default: 'spacerNone', md: 'spacerMd' }}
+                    >
+                        <ToolbarItem>
+                            <Button
+                                aria-label="Notifications"
+                                variant={ButtonVariant.plain}
+                                onClick={logoutClicked}
+                            >Logout</Button>
+                        </ToolbarItem>
+                    </ToolbarGroup>
+                </Toolbar>
+            </MastheadContent>
         </Masthead>
     )
 

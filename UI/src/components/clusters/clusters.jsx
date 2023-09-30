@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
     PageSection,
     Text,
@@ -9,16 +10,26 @@ import {
     ToolbarItem,
     ToolbarContent,
     SearchInput,
-    Button
+    Button,
+    Bullseye,
+    Spinner
 } from '@patternfly/react-core';
 import { Table, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
 
 const Clusters = () => {
-    const repositories = [
-        { id: 'one', cluster_name: 'two', workloads: 'five', recommendations: '0', last_reported: '01-02-2023' },
-        { id: 'one - 2', cluster_name: null, workloads: 'five - 2', recommendations: '1', last_reported: '03-04-2023' },
-        { id: 'one - 3', cluster_name: 'two - 3', workloads: 'five - 3', recommendations: '10', last_reported: '24-12-2023' }
-    ];
+
+    const [clusterDetails, setclusterDetails] = useState(null);
+    const [totalClusters, setTotalClusters] = useState("");
+    useEffect(() => {
+        fetch('http://localhost:8000/api/v1/clusters')
+            .then(response => response.json())
+            .then((data) => {
+                setclusterDetails(data["data"])
+                setTotalClusters(data["count"])
+                console.log(data)
+            }
+            );
+    }, [])
 
     const columnNames = {
         id: 'Id',
@@ -28,11 +39,11 @@ const Clusters = () => {
         last_reported: 'Last Reported'
     };
     return (
-        <>
+        <>{clusterDetails ? <>
             <PageSection variant={PageSectionVariants.light}>
                 <TextContent>
                     <Text component="h1">Clusters</Text>
-                    <Text component="p">Total number openshift clusters in ROS-OCP - </Text>
+                    <Text component="p">Total number openshift clusters in ROS-OCP - {totalClusters}</Text>
                 </TextContent>
             </PageSection>
             <PageSection isWidthLimited isCenterAligned>
@@ -63,13 +74,13 @@ const Clusters = () => {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {repositories.map(repo => (
-                                    <Tr key={repo.id}>
-                                        <Td dataLabel={columnNames.id}>{repo.id}</Td>
-                                        <Td dataLabel={columnNames.cluster_name}>{repo.cluster_name}</Td>
-                                        <Td dataLabel={columnNames.workloads}>{repo.workloads}</Td>
-                                        <Td dataLabel={columnNames.recommendations}>{repo.recommendations}</Td>
-                                        <Td dataLabel={columnNames.last_reported}>{repo.last_reported}</Td>
+                                {clusterDetails.map(cluster => (
+                                    <Tr key={cluster.Id}>
+                                        <Td dataLabel={columnNames.id}>{cluster.Id}</Td>
+                                        <Td dataLabel={columnNames.cluster_name}>{cluster.ClusterName}</Td>
+                                        <Td dataLabel={columnNames.workloads}>{cluster.Workloads}</Td>
+                                        <Td dataLabel={columnNames.recommendations}>{cluster.Recommendations}</Td>
+                                        <Td dataLabel={columnNames.last_reported}>{cluster.LastReported}</Td>
                                     </Tr>
                                 ))}
                             </Tbody>
@@ -77,6 +88,8 @@ const Clusters = () => {
                     </CardBody>
                 </Card>
             </PageSection>
+        </> : <Bullseye><Spinner size="xl" /></Bullseye>
+        }
         </>
     )
 }
