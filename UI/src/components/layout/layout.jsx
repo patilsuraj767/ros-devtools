@@ -16,7 +16,7 @@ import {
 } from '@patternfly/react-core';
 import BarsIcon from '@patternfly/react-icons/dist/js/icons/bars-icon';
 import NavBar from '../navbar/navbar';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Layout = ({ children }) => {
     const navigate = useNavigate();

@@ -24,6 +24,7 @@ func StartAPIServer() {
 
 	v1.GET("/accounts", handlers.GetAccounts)
 	v1.GET("/clusters", handlers.GetClusters)
+	v1.GET("/workloads", handlers.GetWorkloads)
 	s := http.Server{
 		Addr:    ":" + cfg.API_PORT, //local dev server
 		Handler: app,

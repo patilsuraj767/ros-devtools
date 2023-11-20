@@ -14,6 +14,7 @@ import {
     Bullseye,
     Spinner
 } from '@patternfly/react-core';
+import { Link } from "react-router-dom";
 import { Table, Thead, Tr, Th, Tbody, Td } from '@patternfly/react-table';
 
 const Clusters = () => {
@@ -78,8 +79,15 @@ const Clusters = () => {
                                     <Tr key={cluster.Id}>
                                         <Td dataLabel={columnNames.id}>{cluster.Id}</Td>
                                         <Td dataLabel={columnNames.cluster_name}>{cluster.ClusterName}</Td>
-                                        <Td dataLabel={columnNames.workloads}>{cluster.Workloads}</Td>
-                                        <Td dataLabel={columnNames.recommendations}>{cluster.Recommendations}</Td>
+                                        <Td dataLabel={columnNames.workloads}>
+                                            <Link to={`/dashboard/workloads/${cluster.Id}`}>
+                                                {cluster.Workloads}
+                                            </Link>
+
+                                        </Td>
+                                        <Td dataLabel={columnNames.recommendations}>
+                                            {cluster.Recommendations}
+                                        </Td>
                                         <Td dataLabel={columnNames.last_reported}>{cluster.LastReported}</Td>
                                     </Tr>
                                 ))}

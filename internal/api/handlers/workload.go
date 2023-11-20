@@ -10,8 +10,8 @@ import (
 	database "github.com/patilsuraj767/ros-devtools/internal/db"
 )
 
-func GetClusters(c echo.Context) error {
-
+func GetWorkloads(c echo.Context) error {
+	cluster_id := c.QueryParam("cluster-id")
 	limitStr := c.QueryParam("limit")
 	limit := 10 // default value
 	if limitStr != "" {
@@ -32,38 +32,39 @@ func GetClusters(c echo.Context) error {
 
 	// Get total number of clusters
 	db := database.GetDB()
-	query := db.Table("clusters")
+	query := db.Table("workloads")
 	var count int64 = 0
 	query.Count(&count)
 	if query.Error != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"status":  "error",
-			"message": fmt.Sprintf("unable to get clusters. Error: %s", query.Error)})
+			"message": fmt.Sprintf("unable to get workloads. Error: %s", query.Error)})
 	}
 
 	// Get cluster details
 	type result struct {
-		Id              int
-		ClusterName     string    `gorm:"column:cluster_alias"`
-		Workloads       int       `gorm:"column:total_workloads"`
-		Recommendations int       `gorm:"column:total_recommendations"`
-		LastReported    time.Time `gorm:"column:last_reported_at"`
+		Id                int
+		Experiment_name   string    `gorm:"column:experiment_name"`
+		Namespace         string    `gorm:"column:namespace"`
+		Workload_type     string    `gorm:"column:workload_type"`
+		Workload_name     string    `gorm:"column:workload_name"`
+		Containers        string    `gorm:"column:containers"`
+		Metrics_upload_at time.Time `gorm:"column:metrics_upload_at"`
 	}
 	query_result := []result{}
-	query = db.Table("recommendation_sets").Select(
-		"clusters.id",
-		"clusters.cluster_alias",
-		"COUNT(DISTINCT workloads) as total_workloads",
-		"COUNT(recommendation_sets) as total_recommendations",
-		"clusters.last_reported_at",
-	).Joins(`
-		JOIN workloads ON recommendation_sets.workload_id = workloads.id
-		JOIN clusters ON workloads.cluster_id = clusters.id
-	`).Preload("Workload.Cluster").Group("clusters.id").Offset(offset).Limit(limit).Scan(&query_result)
+	query = db.Table("workloads").Select(
+		"workloads.id",
+		"workloads.experiment_name",
+		"workloads.namespace",
+		"workloads.workload_type",
+		"workloads.workload_name",
+		"workloads.containers",
+		"workloads.metrics_upload_at",
+	).Where("cluster_id = ?", cluster_id).Offset(offset).Limit(limit).Scan(&query_result)
 	if query.Error != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"status":  "error",
-			"message": fmt.Sprintf("unable to get cluster details. Error: %s", query.Error)})
+			"message": fmt.Sprintf("unable to get workloads details. Error: %s", query.Error)})
 	}
 	return c.JSON(http.StatusOK, map[string]interface{}{
 		"count": count,

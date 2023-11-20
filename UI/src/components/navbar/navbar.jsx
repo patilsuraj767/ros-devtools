@@ -17,6 +17,15 @@ const NavBar = () => {
     return (
         <Nav onSelect={onNavSelect} aria-label="Nav">
             <NavList>
+                <NavItem
+                    id="dashboard"
+                    itemId="dashboard"
+                    isActive={activeItem === 'dashboard'}
+                >
+                    <Link to='/dashboard'>
+                        Dashboard
+                    </Link>
+                </NavItem>
                 <NavExpandable
                     title="ROS OCP"
                     groupId="rosocp"
